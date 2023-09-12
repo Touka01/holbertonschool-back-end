@@ -2,23 +2,13 @@
 '''
 This module defines functions for fetching and displaying employee TODO list progress using a REST API.
 '''
-
 import requests
 from sys import argv
-
 BASE_URL = 'https://jsonplaceholder.typicode.com'
 
 
 def get_name(id):
-    '''
-    Fetch employee name by ID.
-
-    Args:
-        id (int): The ID of the employee.
-
-    Returns:
-        str: The name of the employee.
-    '''
+    '''Fetch employee name by ID'''
     response = requests.get(f'{BASE_URL}/users/{id}')
     response.raise_for_status()
     user_data = response.json()
@@ -26,30 +16,14 @@ def get_name(id):
 
 
 def get_todos(id):
-    '''
-    Fetch TODOs for the given employee ID.
-
-    Args:
-        id (int): The ID of the employee.
-
-    Returns:
-        list: A list of TODO items.
-    '''
+    '''Fetch TODOs for the given employee ID'''
     response = requests.get(f'{BASE_URL}/todos', params={'userId': id})
     response.raise_for_status()
     return response.json()
 
 
 def display_todo(id):
-    '''
-    Display the TODO list progress for the given employee ID.
-
-    Args:
-        id (int): The ID of the employee.
-
-    Returns:
-        None
-    '''
+    '''Display the TODO list progress for the given employee ID'''
     try:
         employee_name = get_name(id)
         todos = get_todos(id)
@@ -62,7 +36,7 @@ def display_todo(id):
               f"with tasks ({completed_count}/{total_tasks}):")
 
         for task in completed_tasks:
-            print(f"\t {task['title']}")
+            print(f"\t{task['title']}")
 
     except requests.RequestException as e:
         print(f"An error occurred: {e}")
