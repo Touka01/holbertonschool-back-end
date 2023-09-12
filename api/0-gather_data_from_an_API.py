@@ -1,60 +1,76 @@
 #!/usr/bin/python3
+'''
+This module defines functions for fetching and displaying employee TODO list progress using a REST API.
+'''
 
 import requests
-import sys
+from sys import argv
 
-def fetch_employee_todo_progress(employee_id):
-    """
-    Fetches and displays an employee's TODO list progress.
+BASE_URL = 'https://jsonplaceholder.typicode.com'
+
+
+def get_name(id):
+    '''
+    Fetch employee name by ID.
 
     Args:
-        employee_id (int): The ID of the employee to fetch TODO list progress for.
+        id (int): The ID of the employee.
+
+    Returns:
+        str: The name of the employee.
+    '''
+    response = requests.get(f'{BASE_URL}/users/{id}')
+    response.raise_for_status()
+    user_data = response.json()
+    return user_data.get('name')
+
+
+def get_todos(id):
+    '''
+    Fetch TODOs for the given employee ID.
+
+    Args:
+        id (int): The ID of the employee.
+
+    Returns:
+        list: A list of TODO items.
+    '''
+    response = requests.get(f'{BASE_URL}/todos', params={'userId': id})
+    response.raise_for_status()
+    return response.json()
+
+
+def display_todo(id):
+    '''
+    Display the TODO list progress for the given employee ID.
+
+    Args:
+        id (int): The ID of the employee.
 
     Returns:
         None
-    """
-    base_url = 'https://jsonplaceholder.typicode.com'
-    user_url = f'{base_url}/users/{employee_id}'
-    todos_url = f'{base_url}/todos?userId={employee_id}'
-
+    '''
     try:
-        # Fetch user data
-        user_response = requests.get(user_url)
-        user_data = user_response.json()
-        if user_response.status_code != 200:
-            print(f"Error: Unable to fetch user data for employee {employee_id}")
-            return
+        employee_name = get_name(id)
+        todos = get_todos(id)
 
-        # Fetch TODO list data for the employee
-        todos_response = requests.get(todos_url)
-        todos_data = todos_response.json()
-        if todos_response.status_code != 200:
-            print(f"Error: Unable to fetch TODO list for employee {employee_id}")
-            return
+        completed_tasks = [task for task in todos if task['completed']]
+        completed_count = len(completed_tasks)
+        total_tasks = len(todos)
 
-        # Count completed tasks
-        completed_tasks = [task for task in todos_data if task['completed']]
-        num_completed_tasks = len(completed_tasks)
-        total_num_tasks = len(todos_data)
+        print(f"Employee {employee_name} is done "
+              f"with tasks ({completed_count}/{total_tasks}):")
 
-        # Display employee information and progress
-        print(f"Employee {user_data['name']} is done with tasks "
-              f"({num_completed_tasks}/{total_num_tasks}):")
-
-        # Display titles of completed tasks
         for task in completed_tasks:
-            print(f"\t{task['title']}")
+            print(f"\t {task['title']}")
 
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <employee_id>")
-        sys.exit(1)
+    if len(argv) < 2:
+        exit(1)
 
-    try:
-        employee_id = int(sys.argv[1])
-        fetch_employee_todo_progress(employee_id)
-    except ValueError:
-        print("Error: Employee ID must be an integer.")
+    employee_id = int(argv[1])
+    display_todo(employee_id)
