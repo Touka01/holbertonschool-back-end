@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 '''
-This module defines a script that interacts with a REST API to fetch and export
-employee task data in CSV format.
+This module defines a script to fetch and export user tasks from a REST API to a CSV file.
 '''
 
 import requests
@@ -13,13 +12,13 @@ BASE_URL = 'https://jsonplaceholder.typicode.com'
 
 def get_user_info(id):
     '''
-    Fetch user information by user ID.
+    Fetch user information by ID from the REST API.
 
     Args:
         id (int): The ID of the user.
 
     Returns:
-        dict: A dictionary containing user information.
+        dict: User information in dictionary format.
     '''
     response = requests.get(f'{BASE_URL}/users/{id}')
     response.raise_for_status()
@@ -28,13 +27,13 @@ def get_user_info(id):
 
 def get_user_todos(id):
     '''
-    Fetch user's TODO tasks by user ID.
+    Fetch TODOs for a given user ID from the REST API.
 
     Args:
         id (int): The ID of the user.
 
     Returns:
-        list: A list of TODO tasks for the user.
+        list: A list of TODO items.
     '''
     response = requests.get(f'{BASE_URL}/todos', params={'userId': id})
     response.raise_for_status()
@@ -43,12 +42,12 @@ def get_user_todos(id):
 
 def export_user_tasks_to_csv(user_id, username, tasks):
     '''
-    Export user's tasks to a CSV file.
+    Export user tasks to a CSV file.
 
     Args:
         user_id (int): The ID of the user.
         username (str): The username of the user.
-        tasks (list): A list of tasks for the user.
+        tasks (list): A list of user tasks.
 
     Returns:
         None
