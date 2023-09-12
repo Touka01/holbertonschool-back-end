@@ -18,12 +18,14 @@ def fetch_employee_todo_progress(employee_id):
     todos_url = f'{base_url}/todos?userId={employee_id}'
 
     try:
+        # Fetch user data
         user_response = requests.get(user_url)
         user_data = user_response.json()
         if user_response.status_code != 200:
             print(f"Error: Unable to fetch user data for employee {employee_id}")
             return
 
+        # Fetch TODO list data for the employee
         todos_response = requests.get(todos_url)
         todos_data = todos_response.json()
         if todos_response.status_code != 200:
