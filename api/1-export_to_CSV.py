@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 '''
-This module defines a script to fetch and export user tasks from a REST API to a CSV file.
+This module defines a script to fetch and
+export user tasks from a REST API to a CSV file.
 '''
 
 import requests
