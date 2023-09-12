@@ -56,10 +56,20 @@ def export_user_tasks_to_csv(user_id, username, tasks):
 
     with open(file_name, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
+        csv_writer.writerow([
+            "USER_ID",
+            "USERNAME",
+            "TASK_COMPLETED_STATUS",
+            "TASK_TITLE"
+        ])
 
         for task in tasks:
-            csv_writer.writerow([user_id, username, task["completed"], task["title"]])
+            csv_writer.writerow([
+                user_id,
+                username,
+                task["completed"],
+                task["title"]
+            ])
 
     print(f'Tasks for User {user_id} exported to {file_name}')
 
