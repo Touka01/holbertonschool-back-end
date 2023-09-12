@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-This module defines functions for fetching and displaying employee TODO list progress using a REST API.
+This module defines the REST API
 '''
 import requests
 from sys import argv
@@ -33,10 +33,10 @@ def display_todo(id):
         total_tasks = len(todos)
 
         print(f"Employee {employee_name} is done "
-              f"with tasks ({completed_count}/{total_tasks}):")
+              f"with tasks({completed_count}/{total_tasks}):")
 
         for task in completed_tasks:
-            print(f"\t{task['title']}")
+            print(f"\t {task['title']}")
 
     except requests.RequestException as e:
         print(f"An error occurred: {e}")
