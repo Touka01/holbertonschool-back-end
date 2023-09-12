@@ -4,8 +4,8 @@ This module defines a script to fetch and
 export user tasks from a REST API to a CSV file.
 '''
 
-import requests
 import csv
+import requests
 import sys
 
 BASE_URL = 'https://jsonplaceholder.typicode.com'
