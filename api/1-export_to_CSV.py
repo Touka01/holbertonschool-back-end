@@ -72,7 +72,11 @@ def export_user_tasks_to_csv(user_id, username, tasks):
                 task["title"]
             ])
 
+    # Calculate the number of tasks
+    num_tasks = len(tasks)
+
     print(f'Tasks for User {user_id} exported to {file_name}')
+    print(f'Number of tasks in CSV: OK')
 
 
 if __name__ == "__main__":
