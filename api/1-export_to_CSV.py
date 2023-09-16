@@ -1,96 +1,80 @@
 #!/usr/bin/python3
 '''
-This module defines a script to fetch and
-export user tasks from a REST API to a CSV file.
+This module defines the REST API.
 '''
-
 import csv
 import requests
-import sys
-
+from sys import argv
 BASE_URL = 'https://jsonplaceholder.typicode.com'
 
 
-def get_user_info(id):
-    '''
-    Fetch user information by ID from the REST API.
-
-    Args:
-        id (int): The ID of the user.
-
-    Returns:
-        dict: User information in dictionary format.
-    '''
+def get_name(id):
+    '''Fetch employee name by ID'''
     response = requests.get(f'{BASE_URL}/users/{id}')
     response.raise_for_status()
-    return response.json()
+    user_data = response.json()
+    return user_data.get('name')
 
 
-def get_user_todos(id):
-    '''
-    Fetch TODOs for a given user ID from the REST API.
-
-    Args:
-        id (int): The ID of the user.
-
-    Returns:
-        list: A list of TODO items.
-    '''
+def get_todos(id):
+    '''Fetch TODOs for the given employee ID'''
     response = requests.get(f'{BASE_URL}/todos', params={'userId': id})
     response.raise_for_status()
     return response.json()
 
 
-def export_user_tasks_to_csv(user_id, username, tasks):
-    '''
-    Export user tasks to a CSV file.
+def display_todo(id):
+    '''Display the TODO list progress for the given employee ID'''
+    try:
+        employee_name = get_name(id)
+        todos = get_todos(id)
 
-    Args:
-        user_id (int): The ID of the user.
-        username (str): The username of the user.
-        tasks (list): A list of user tasks.
+        completed_tasks = [task for task in todos if task['completed']]
+        completed_count = len(completed_tasks)
+        total_tasks = len(todos)
 
-    Returns:
-        None
-    '''
-    file_name = f'{user_id}.csv'
+        print(f"Employee {employee_name} is done "
+              f"with tasks({completed_count}/{total_tasks}):")
 
-    with open(file_name, 'w', newline='') as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerow([
-            "USER_ID",
-            "USERNAME",
-            "TASK_COMPLETED_STATUS",
-            "TASK_TITLE"
-        ])
+        for task in completed_tasks:
+            print(f"\t {task['title']}")
 
-        for task in tasks:
-            csv_writer.writerow([
-                user_id,
-                username,
-                task["completed"],
-                task["title"]
-            ])
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
 
-    # Calculate the number of tasks
-    num_tasks = len(tasks)
 
-    print(f'Tasks for User {user_id} exported to {file_name}')
-    print(f'Number of tasks in CSV: OK')
+def export_to_csv(id):
+    '''Export the TODO list to CSV for the given employee ID'''
+    try:
+        user_data = requests.get(f'{BASE_URL}/users/{id}').json()
+        employee_username = user_data.get('username')
+
+        todos = get_todos(id)
+
+        with open(f"{id}.csv", "w", newline='') as csv_file:
+            fieldnames = [
+                "USER_ID",
+                "USERNAME",
+                "TASK_COMPLETED_STATUS",
+                "TASK_TITLE"
+            ]
+            writer = csv.DictWriter(
+                csv_file, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+            for task in todos:
+                writer.writerow({
+                    "USER_ID": id,
+                    "USERNAME": employee_username,
+                    "TASK_COMPLETED_STATUS": task['completed'],
+                    "TASK_TITLE": task['title']
+                })
+
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python script.py <employee_id>")
-        sys.exit(1)
+    if len(argv) < 2:
+        exit(1)
 
-    try:
-        employee_id = int(sys.argv[1])
-        user_info = get_user_info(employee_id)
-        user_username = user_info.get('username')
-        user_tasks = get_user_todos(employee_id)
-        export_user_tasks_to_csv(employee_id, user_username, user_tasks)
-    except ValueError:
-        print("Error: Employee ID must be an integer.")
-    except requests.RequestException as e:
-        print(f"An error occurred: {e}")
+    employee_id = int(argv[1])
+    export_to_csv(employee_id)
